@@ -1,0 +1,1952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The CFO Inbound Framework - Case Study Dashboard</title>
+    <style>
+        /* ===== GOOGLE FONTS ===== */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;600;700&display=swap');
+
+        /* ===== GLOBAL RESET & BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #1B3B6F;
+            --gold: #D4AF37;
+            --red: #DC3545;
+            --green: #28A745;
+            --light-blue: #E8F4F8;
+            --light-gray: #F8F9FA;
+            --dark-gray: #6C757D;
+            --white: #FFFFFF;
+            --border: #DEE2E6;
+        }
+
+        body {
+            font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #ffffff;
+            font-size: 14px;
+        }
+
+        /* ===== PRINT STYLES FOR PDF ===== */
+        @media print {
+            body {
+                width: 210mm;
+                margin: 0;
+                padding: 0;
+            }
+            .page-break {
+                page-break-after: always;
+            }
+            .no-print {
+                display: none;
+            }
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
+
+        /* ===== TYPOGRAPHY ===== */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        h1 { font-size: 2.5rem; color: var(--navy); }
+        h2 { font-size: 2rem; color: var(--navy); }
+        h3 { font-size: 1.5rem; color: var(--navy); }
+        h4 { font-size: 1.25rem; color: var(--navy); }
+
+        /* ===== LAYOUT STRUCTURE ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        .page {
+            padding: 3rem 2rem;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* ===== COVER PAGE ===== */
+        .cover-page {
+            background: linear-gradient(135deg, var(--navy) 0%, #2a5298 100%);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .cover-content {
+            max-width: 800px;
+        }
+
+        .cover-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            color: var(--white);
+            letter-spacing: -1px;
+        }
+
+        .cover-subtitle {
+            font-size: 1.5rem;
+            color: var(--gold);
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        .cover-divider {
+            width: 200px;
+            height: 4px;
+            background: var(--gold);
+            margin: 2rem auto;
+        }
+
+        .cover-description {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .cover-badge {
+            background: var(--gold);
+            color: var(--navy);
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            display: inline-block;
+            margin-top: 2rem;
+            font-size: 1.1rem;
+        }
+
+        /* ===== SECTION HEADERS ===== */
+        .section-header {
+            background: var(--navy);
+            color: var(--white);
+            padding: 1.5rem 2rem;
+            margin: -3rem -2rem 2rem -2rem;
+            text-align: center;
+        }
+
+        .section-header h2 {
+            color: var(--white);
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .section-header p {
+            color: var(--gold);
+            margin: 0.5rem 0 0 0;
+            font-size: 1.1rem;
+        }
+
+        /* ===== GRID LAYOUTS ===== */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== CARDS & BOXES ===== */
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+            height: 100%;
+        }
+
+        .card-header {
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid var(--gold);
+        }
+
+        .before-card {
+            background: #FFF5F5;
+            border-left: 5px solid var(--red);
+        }
+
+        .before-card .card-header {
+            color: var(--red);
+            border-bottom-color: var(--red);
+        }
+
+        .after-card {
+            background: #F0FFF4;
+            border-left: 5px solid var(--green);
+        }
+
+        .after-card .card-header {
+            color: var(--green);
+            border-bottom-color: var(--green);
+        }
+
+        .info-card {
+            background: var(--light-blue);
+            border-left: 5px solid var(--navy);
+        }
+
+        /* ===== STATS BOXES ===== */
+        .stat-box {
+            text-align: center;
+            padding: 2rem;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 2px solid var(--border);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            font-family: 'Montserrat', sans-serif;
+            color: var(--navy);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            color: var(--dark-gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .stat-box.red .stat-number { color: var(--red); }
+        .stat-box.green .stat-number { color: var(--green); }
+        .stat-box.gold .stat-number { color: var(--gold); }
+
+        /* ===== COMPARISON BARS ===== */
+        .comparison-bar {
+            margin: 1.5rem 0;
+        }
+
+        .comparison-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .bar-container {
+            background: var(--light-gray);
+            border-radius: 10px;
+            overflow: hidden;
+            height: 40px;
+            position: relative;
+        }
+
+        .bar-before {
+            background: linear-gradient(90deg, var(--red), #ff6b7a);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 1rem;
+            color: var(--white);
+            font-weight: 700;
+            transition: width 0.8s ease;
+        }
+
+        .bar-after {
+            background: linear-gradient(90deg, var(--green), #48bb78);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 1rem;
+            color: var(--white);
+            font-weight: 700;
+            transition: width 0.8s ease;
+        }
+
+        .percentage-badge {
+            background: var(--gold);
+            color: var(--navy);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-left: 1rem;
+        }
+
+        /* ===== TIMELINE ===== */
+        .timeline {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .timeline-marker {
+            width: 60px;
+            height: 60px;
+            background: var(--navy);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--white);
+            flex-shrink: 0;
+            margin-right: 1.5rem;
+            box-shadow: 0 4px 12px rgba(27, 59, 111, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        .timeline-item:not(:last-child) .timeline-marker::after {
+            content: '';
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 3px;
+            height: 60px;
+            background: var(--border);
+            z-index: 1;
+        }
+
+        .timeline-content {
+            flex: 1;
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+        }
+
+        .timeline-week {
+            font-weight: 700;
+            color: var(--gold);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--navy);
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-description {
+            color: var(--dark-gray);
+        }
+
+        /* ===== CONTENT EXAMPLES ===== */
+        .content-example {
+            background: var(--light-gray);
+            border-left: 4px solid var(--navy);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            font-style: italic;
+            position: relative;
+        }
+
+        .content-example::before {
+            content: '"';
+            font-size: 4rem;
+            color: var(--gold);
+            opacity: 0.3;
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            font-family: Georgia, serif;
+        }
+
+        .lead-magnet-badge {
+            background: var(--gold);
+            color: var(--navy);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 700;
+            display: inline-block;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .results-box {
+            background: var(--light-blue);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .results-box h5 {
+            color: var(--navy);
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .results-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .results-box li {
+            padding: 0.25rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .results-box li::before {
+            content: '✓';
+            color: var(--green);
+            font-weight: 700;
+            position: absolute;
+            left: 0;
+        }
+
+        /* ===== TABLE STYLES ===== */
+        .table-container {
+            overflow-x: auto;
+            margin: 2rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        thead {
+            background: var(--navy);
+            color: var(--white);
+        }
+
+        th {
+            padding: 1.25rem 1rem;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody tr:hover {
+            background: var(--light-gray);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* ===== COMPARISON TABLE ===== */
+        .comparison-table {
+            margin: 2rem 0;
+        }
+
+        .comparison-table table {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .comparison-table .negative {
+            background: #FFF5F5;
+        }
+
+        .comparison-table .positive {
+            background: #F0FFF4;
+        }
+
+        .comparison-table .negative td:first-child {
+            border-left: 4px solid var(--red);
+        }
+
+        .comparison-table .positive td:first-child {
+            border-left: 4px solid var(--green);
+        }
+
+        /* ===== QUOTE/TESTIMONIAL ===== */
+        .testimonial {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            margin: 3rem 0;
+            position: relative;
+        }
+
+        .testimonial::before {
+            content: '"';
+            font-size: 8rem;
+            color: var(--gold);
+            opacity: 0.2;
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: Georgia, serif;
+        }
+
+        .testimonial-text {
+            font-size: 1.5rem;
+            font-style: italic;
+            color: var(--navy);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .testimonial-author {
+            font-weight: 700;
+            color: var(--dark-gray);
+            font-size: 1rem;
+        }
+
+        .testimonial-role {
+            color: var(--gold);
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        /* ===== FLOWCHART ===== */
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 2rem 0;
+        }
+
+        .flow-item {
+            background: var(--white);
+            border: 2px solid var(--navy);
+            border-radius: 12px;
+            padding: 1.5rem 2rem;
+            margin: 0.5rem 0;
+            text-align: center;
+            min-width: 300px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .flow-arrow {
+            font-size: 2rem;
+            color: var(--gold);
+            margin: 0.5rem 0;
+        }
+
+        .flow-split {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            width: 100%;
+            margin: 1rem 0;
+        }
+
+        .flow-split .flow-item {
+            min-width: auto;
+            font-size: 0.9rem;
+            padding: 1rem;
+        }
+
+        /* ===== CTA SECTION ===== */
+        .cta-section {
+            background: linear-gradient(135deg, var(--gold), #f0c850);
+            border-radius: 16px;
+            padding: 3rem;
+            text-align: center;
+            margin: 3rem 0;
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+        }
+
+        .cta-title {
+            color: var(--navy);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .cta-text {
+            color: var(--navy);
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .cta-button {
+            background: var(--navy);
+            color: var(--white);
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.25rem;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(27, 59, 111, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(27, 59, 111, 0.4);
+        }
+
+        /* ===== ICONS ===== */
+        .icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* ===== BADGE SYSTEM ===== */
+        .badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin: 0.25rem;
+        }
+
+        .badge-success { background: var(--green); color: var(--white); }
+        .badge-danger { background: var(--red); color: var(--white); }
+        .badge-info { background: var(--navy); color: var(--white); }
+        .badge-warning { background: var(--gold); color: var(--navy); }
+
+        /* ===== LIST STYLES ===== */
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 0.75rem 0;
+            padding-left: 2rem;
+            position: relative;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .checklist li:last-child {
+            border-bottom: none;
+        }
+
+        .checklist li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--green);
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        /* ===== PROFILE BOX ===== */
+        .profile-box {
+            background: linear-gradient(135deg, var(--light-blue), #d4e9f7);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 2px solid var(--navy);
+        }
+
+        .profile-box h4 {
+            margin-bottom: 1.5rem;
+            color: var(--navy);
+        }
+
+        .profile-item {
+            display: flex;
+            align-items: center;
+            margin: 0.75rem 0;
+            font-size: 1rem;
+        }
+
+        .profile-icon {
+            width: 30px;
+            margin-right: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .profile-label {
+            font-weight: 700;
+            color: var(--navy);
+            min-width: 140px;
+        }
+
+        .profile-value {
+            color: var(--dark-gray);
+        }
+
+        /* ===== OUTCOME BOX ===== */
+        .outcome-box {
+            background: linear-gradient(135deg, var(--green), #48bb78);
+            color: var(--white);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin: 3rem 0;
+            box-shadow: 0 8px 24px rgba(40, 167, 69, 0.3);
+        }
+
+        .outcome-box h3 {
+            color: var(--white);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+
+        .outcome-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .outcome-item {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .outcome-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .outcome-text {
+            font-weight: 600;
+            font-size: 1.1rem;
+            line-height: 1.4;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 3px solid var(--gold);
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+
+        .footer-divider {
+            width: 100px;
+            height: 3px;
+            background: var(--gold);
+            margin: 1.5rem auto;
+        }
+
+        .author-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 1rem;
+        }
+
+        .linkedin-cta {
+            background: var(--navy);
+            color: var(--white);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            margin: 1.5rem 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(27, 59, 111, 0.3);
+        }
+
+        .linkedin-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(27, 59, 111, 0.4);
+            background: #2a5298;
+        }
+
+        /* ===== UTILITY CLASSES ===== */
+        .text-center { text-align: center; }
+        .text-navy { color: var(--navy); }
+        .text-gold { color: var(--gold); }
+        .text-green { color: var(--green); }
+        .text-red { color: var(--red); }
+        .mb-2 { margin-bottom: 2rem; }
+        .mt-2 { margin-top: 2rem; }
+        .fw-bold { font-weight: 700; }
+
+        /* ===== DIVIDER ===== */
+        .divider {
+            height: 3px;
+            background: var(--gold);
+            margin: 2rem 0;
+        }
+
+        /* ===== PROBLEM BOX ===== */
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .problem-item {
+            background: linear-gradient(135deg, var(--red), #ff6b7a);
+            color: var(--white);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        .problem-item .icon {
+            margin-bottom: 0.75rem;
+            font-size: 2rem;
+        }
+
+        .solution-box {
+            background: linear-gradient(135deg, var(--green), #48bb78);
+            color: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        .solution-box h3 {
+            color: var(--white);
+            margin-bottom: 1.5rem;
+        }
+
+        .solution-box ul {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            max-width: 400px;
+            margin: 1.5rem auto;
+        }
+
+        .solution-box li {
+            padding: 0.5rem 0;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .solution-box li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        /* ===== INSIGHT BOX ===== */
+        .insight-box {
+            background: linear-gradient(135deg, var(--gold), #f0c850);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-left: 5px solid var(--navy);
+        }
+
+        .insight-box h5 {
+            color: var(--navy);
+            margin-bottom: 0.75rem;
+        }
+
+        .insight-box p {
+            color: var(--navy);
+            line-height: 1.8;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== COVER PAGE ===== -->
+    <div class="page cover-page">
+        <div class="cover-content">
+            <h1 class="cover-title">THE CFO INBOUND FRAMEWORK</h1>
+            <div class="cover-divider"></div>
+            <p class="cover-subtitle">How Finance Leaders Get Headhunted (Not Apply)</p>
+            <p class="cover-description">
+                A Strategic Blueprint for Western & GCC Executives<br>
+                Targeting CFO Roles in Saudi Arabia & UAE
+            </p>
+            <div class="cover-badge">90-DAY TRANSFORMATION CASE STUDY</div>
+        </div>
+    </div>
+
+    <!-- ===== THE PROBLEM ===== -->
+    <div class="page page-break">
+        <div class="section-header">
+            <h2>THE EXECUTIVE JOB SEARCH PROBLEM</h2>
+            <p>Why Traditional Methods Fail at the C-Suite Level</p>
+        </div>
+
+        <div class="grid-2" style="margin-top: 3rem;">
+            <div>
+                <h3 class="text-red mb-2">❌ Traditional Methods Fail</h3>
+                <div class="problem-grid" style="grid-template-columns: 1fr;">
+                    <div class="problem-item">
+                        <div class="icon">📧</div>
+                        <div>OUTBOUND OUTREACH</div>
+                        <div style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.9;">3-5% Response Rate</div>
+                    </div>
+                    <div class="problem-item">
+                        <div class="icon">🔍</div>
+                        <div>HEADHUNTER EMAILS</div>
+                        <div style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.9;">Ignored or Archived</div>
+                    </div>
+                    <div class="problem-item">
+                        <div class="icon">💼</div>
+                        <div>ONLINE APPLICATIONS</div>
+                        <div style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.9;">Black Holes</div>
+                    </div>
+                    <div class="problem-item">
+                        <div class="icon">🤝</div>
+                        <div>NETWORKING EVENTS</div>
+                        <div style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.9;">Expensive, Low ROI</div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-green mb-2">✅ The Solution</h3>
+                <div class="solution-box">
+                    <h3>BUILD AN INBOUND ECOSYSTEM WHERE:</h3>
+                    <ul>
+                        <li>CEOs seek you out</li>
+                        <li>Headhunters hunt you</li>
+                        <li>Boards find you</li>
+                    </ul>
+                    <div style="margin-top: 1.5rem; font-weight: 700; font-size: 1.25rem;">
+                        BEFORE roles are posted
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="insight-box" style="margin-top: 3rem;">
+            <h5>💡 THE TRUTH</h5>
+            <p>The best CFO roles are filled BEFORE they're posted—through relationships, headhunter networks, and strategic visibility.</p>
+        </div>
+    </div>
+
+    <!-- ===== CASE STUDY OVERVIEW ===== -->
+    <div class="page page-break">
+        <div class="section-header">
+            <h2>CASE STUDY: FINANCE DIRECTOR → CFO</h2>
+            <p>90-Day Transformation</p>
+        </div>
+
+        <div class="profile-box" style="margin-top: 3rem;">
+            <h4 class="text-center">CLIENT PROFILE</h4>
+            <div class="profile-item">
+                <div class="profile-icon">📊</div>
+                <div class="profile-label">Qualification:</div>
+                <div class="profile-value">ICAEW</div>
+            </div>
+            <div class="profile-item">
+                <div class="profile-icon">📅</div>
+                <div class="profile-label">Experience:</div>
+                <div class="profile-value">14 Years</div>
+            </div>
+            <div class="profile-item">
+                <div class="profile-icon">🏢</div>
+                <div class="profile-label">Background:</div>
+                <div class="profile-value">Big 4 + Multinational FMCG Finance Leadership</div>
+            </div>
+            <div class="profile-item">
+                <div class="profile-icon">🎯</div>
+                <div class="profile-label">Target:</div>
+                <div class="profile-value">CFO Roles in Vision 2030 Companies</div>
+            </div>
+            <div class="profile-item">
+                <div class="profile-icon">🌍</div>
+                <div class="profile-label">Location:</div>
+                <div class="profile-value">Western Expat Seeking GCC C-Suite Placement</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== BEFORE & AFTER COMPARISON ===== -->
+    <div class="page page-break">
+        <div class="section-header">
+            <h2>BEFORE & AFTER TRANSFORMATION</h2>
+            <p>The Journey from "Invisible Expert" to "Sought-After Authority"</p>
+        </div>
+
+        <div class="grid-2" style="margin-top: 3rem;">
+            <!-- BEFORE -->
+            <div class="before-card card">
+                <div class="card-header">❌ BEFORE: The "Invisible Expert"</div>
+                
+                <h5 style="margin-top: 1.5rem; margin-bottom: 1rem; color: var(--red);">THE SITUATION</h5>
+                <ul style="line-height: 2; color: var(--dark-gray);">
+                    <li>Sending CVs to 20+ headhunters monthly</li>
+                    <li>Applying to jobs with 200+ applicants</li>
+                    <li>LinkedIn = boring digital CV</li>
+                    <li>Zero thought leadership or content</li>
+                    <li>Seen as "another finance manager"</li>
+                </ul>
+
+                <h5 style="margin-top: 1.5rem; margin-bottom: 1rem; color: var(--red);">THE PROBLEM</h5>
+                <div class="stat-box red" style="margin: 1rem 0;">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Inbound Inquiries</div>
+                </div>
+                <div class="stat-box red" style="margin: 1rem 0;">
+                    <div class="stat-number">40-60</div>
+                    <div class="stat-label">Profile Views/Week</div>
+                </div>
+                <div class="stat-box red" style="margin: 1rem 0;">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">CEO Meetings</div>
+                </div>
+
+                <div class="content-example" style="margin-top: 1.5rem; background: #fff; border-left-color: var(--red);">
+                    <strong>LinkedIn Profile Said:</strong><br>
+                    "Experienced Finance Director seeking CFO opportunities in Saudi Arabia..."<br><br>
+                    <strong style="color: var(--red);">Translation:</strong> "Please hire me."
+                </div>
+            </div>
+
+            <!-- AFTER -->
+            <div class="after-card card">
+                <div class="card-header">✅ AFTER: The "Sought-After Authority"</div>
+                
+                <h5 style="margin-top: 1.5rem; margin-bottom: 1rem; color: var(--green);">THE TRANSFORMATION</h5>
+                <ul style="line-height: 2; color: var(--dark-gray);">
+                    <li>Inbound ecosystem launched</li>
+                    <li>Strategic content published 2-3x/week</li>
+                    <li>Lead magnets deployed & converting</li>
+                    <li>Authority positioning active</li>
+                    <li>Positioned as "The CFO who solves X"</li>
+                </ul>
+
+                <h5 style="margin-top: 1.5rem; margin-bottom: 1rem; color: var(--green);">THE RESULTS</h5>
+                <div class="stat-box green" style="margin: 1rem 0;">
+                    <div class="stat-number">11</div>
+                    <div class="stat-label">Headhunter Inquiries</div>
+                </div>
+                <div class="stat-box green" style="margin: 1rem 0;">
+                    <div class="stat-number">320-450</div>
+                    <div class="stat-label">Profile Views/Week <span style="font-size: 1.25rem;">↑650%</span></div>
+                </div>
+                <div class="stat-box gold" style="margin: 1rem 0;">
+                    <div class="stat-number">2</div>
+                    <div class="stat-label">CFO Offers (90 Days)</div>
+                </div>
+
+                <div class="content-example" style="margin-top: 1.5rem; background: #fff; border-left-color: var(--green);">
+                    <strong>Client's Words:</strong><br>
+                    "I went from chasing headhunters to choosing between offers. The content ecosystem changed everything."
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== VISIBILITY METRICS ===== -->
+    <div class="page page-break">
+        <div class="section-header">
+            <h2>📊 90-DAY RESULTS: VISIBILITY TRANSFORMATION</h2>
+            <p>Quantifiable Impact on Executive Presence</p>
+        </div>
+
+        <div style="margin-top: 3rem;">
+            <div class="comparison-bar">
+                <div class="comparison-label">
+                    <span><strong>Profile Views per Week</strong></span>
+                    <span class="percentage-badge">+650%</span>
+                </div>
+                <div style="font-size: 0.9rem; color: var(--dark-gray); margin-bottom: 0.5rem;">
+                    <span style="color: var(--red);">Before: 40-60</span> → <span style="color: var(--green);">After: 320-450</span>
+                </div>
+                <div class="bar-container">
+                    <div class="bar-after" style="width: 85%;"></div>
+                </div>
+            </div>
+
+            <div class="comparison-bar">
+                <div class="comparison-label">
+                    <span><strong>Inbound Connection Requests per Week</strong></span>
+                    <span class="percentage-badge">+700%</span>
+                </div>
+                <div style="font-size: 0.9rem; color: var(--dark-gray); margin-bottom: 0.5rem;">
+                    <span style="color: var(--red);">Before: 2-5</span> → <span style="color: var(--green);">After: 25-40</span>
+                </div>
+                <div class="bar-container">
+                    <div class="bar-after" style="width: 90%;"></div>
+                </div>
+            </div>
+
+            <div class="comparison-bar">
+                <div class="comparison-label">
+                    <span><strong>Post Impressions (Average)</strong></span>
+                    <span class="percentage-badge">+2,400%</span>
+                </div>
+                <div style="font-size: 0.9rem; color: var(--dark-gray); margin-bottom: 0.5rem;">
+                    <span style="color: var(--red);">Before: 400-800</span> → <span style="color: var(--green);">After: 8,000-22,000</span>
+                </div>
+                <div class="bar-container">
+                    <div class="bar-after" style="width: 95%;"></div>
+                </div>
+            </div>
+
+            <div class="comparison-bar">
+                <div class="comparison-label">
+                    <span><strong>C-Suite Engagement per Post</strong></span>
+                    <span class="percentage-badge">NEW</span>
+                </div>
+                <div style="font-size: 0.9rem; color: var(--dark-gray); margin-bottom: 0.5rem;">
+                    <span style="color: var(--red);">Before: 0</span> → <span style="color: var(--green);">After: 15-30 comments</span>
+                </div>
+                <div class="bar-container">
+                    <div class="bar-after" style="width: 88%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="insight-box" style="margin-top: 3rem;">
+            <h5>💡 KEY INSIGHT</h5>
+            <p>The dramatic increase in visibility metrics directly correlated with quality opportunities. Higher profile views from the right audience (CEOs, headhunters, board members) led to meaningful conversations, not just vanity metrics.</p>
+        </div>
+    </div>
+
+    <!-- ===== TRANSFORMATION PHASES ===== -->
+    <div class="page page-break">
+        <div class="section-header">
+            <h2>THE 90-DAY TRANSFORMATION</h2>
+            <p>Three Strategic Phases to Inbound Success</p>
+        </div>
+
+        <div class="grid-3" style="margin-top: 3rem;">
+            <div class="card" style="background: var(--light-blue);">
+                <div class="icon text-center">🎯</div>
+                <h4 class="text-center text-navy">PHASE 1</h4>
+                <h5 class="text-center text-gold">Strategic Positioning</h5>
+                <p class="text-center" style="color: var(--dark-gray); margin-bottom: 1.5rem; font-weight: 600;">WEEK 1-2</p>
+                
+                <ul class="checklist">
+                    <li>LinkedIn profile overhaul</li>
+                    <li>Headline rewrite</li>
+                    <li>CV redraft (C-suite lens)</li>
+                    <li>Executive bio creation</li>
+                    <li>Authority framework development</li>
+                </ul>
+            </div>
+
+            <div class="card" style="background: var(--light-blue);">
+                <div class="icon text-center">📝</div>
+                <h4 class="text-center text-navy">PHASE 2</h4>
+                <h5 class="text-center text-gold">Content Ecosystem</h5>
+                <p class="text-center" style="color: var(--dark-gray); margin-bottom: 1.5rem; font-weight: 600;">WEEK 3-8</p>
+                
+                <ul class="checklist">
+                    <li>CEO-focused content strategy</li>
+                    <li>Headhunter insights & benchmarks</li>
+                    <li>Peer CFO engagement content</li>
+                    <li>2-3 ghost-written posts/week</li>
+                    <li>Lead magnet deployment</li>
+                </ul>
+            </div>
+
+            <div class="card" style="background: var(--light-blue);">
+                <div class="icon text-center">🤝</div>
+                <h4 class="text-center text-navy">PHASE 3</h4>
+                <h5 class="text-center text-gold">Lead Nurture</h5>
+                <p class="text-center" style="color: var(--dark-gray); margin-bottom: 1.5rem; font-weight: 600;">WEEK 9-12</p>
+                
+                <ul class="checklist">
+                    <li>90-Day Cash Flow Tool delivery</li>
+                    <li>CFO Scorecard distribution</li>
+                    <li>Salary Playbook sharing</li>
+                    <li>DM response frameworks</li>
+                    <li>Meeting & interview prep</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== HEADLINE TRANSFORMATION ===== -->
+    <div class="page page-break">
+        <div class="section-header">
+            <h2>📌 PHASE 1: STRATEGIC POSITIONING</h2>
+            <p>Transforming from Job Seeker to Market Authority</p>
+        </div>
+
+        <div style="margin-top: 3rem;">
+            <h3 class="text-center mb-2">LinkedIn Headline Transformation</h3>
+            
+            <div class="grid-2">
+                <div class="before-card card">
+                    <div class="card-header">❌ BEFORE</div>
+                    <div style="font-size: 1.25rem; line-height: 1.6; padding: 1.5rem; background: var(--white); border-radius: 8px; margin-top: 1rem;">
+                        "Finance Director | ICAEW | Seeking CFO Role"
+                    </div>
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(220, 53, 69, 0.1); border-radius: 8px;">
+                        <strong style="color: var(--red);">Shows:</strong> Desperation & unemployment
+                    </div>
+                </div>
+
+                <div class="after-card card">
+                    <div class="card-header">✅ AFTER</div>
+                    <div style="font-size: 1.25rem; line-height: 1.6; padding: 1.5rem; background: var(--white); border-radius: 8px; margin-top: 1rem;">
+                        "CFO Advisor | Helping Vision 2030 CEOs Free Up 500K-5M SAR in 90 Days | Cash Flow Optimization"
+                    </div>
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(40, 167, 69, 0.1); border-radius: 8px;">
+                        <strong style="color: var(--green);">Shows:</strong> Authority & specific value proposition
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 3rem;">
+            <h3 class="text-center mb-2">Profile Summary Transformation</h3>
+            
+            <div class="comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 50%;">❌ OLD SUMMARY</th>
+                            <th style="width: 50%;">✅ NEW SUMMARY</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="negative">
+                                <p style="font-style: italic; line-height: 1.8;">
+                                    "Experienced Finance Director seeking CFO opportunities in Saudi Arabia. Proven track record in financial planning, reporting, and compliance. Strong communicator with Big 4 background."
+                                </p>
+                                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                                    <strong style="color: var(--red);">Problem:</strong> "I'm looking for a job."
+                                </div>
+                            </td>
+                            <td class="positive">
+                                <p style="font-style: italic; line-height: 1.8;">
+                                    "I help Vision 2030 CEOs solve their biggest finance challenge: trapped cash.
+                                    <br><br>
+                                    My 90-Day Cash Flow Acceleration System has freed up 500K-5M SAR for Saudi companies without cutting headcount."
+                                </p>
+                                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                                    <strong style="color: var(--green);">Solution:</strong> "I solve your problem."
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CONTENT ECOSYSTEM ===== -->
+    <div class="page page-break">
+        <div class="section-header">
+            <h2>📝 PHASE 2: INBOUND CONTENT ECOSYSTEM</h2>
+            <p>12-Week Campaign Targeting 3 Key Stakeholders</p>
+        </div>
+
+        <div style="margin-top: 3rem;">
+            <h3 class="text-center mb-2">Content Distribution Strategy</h3>
+            
+            <div class="grid-3">
+                <div class="card" style="border-top: 5px solid var(--navy);">
+                    <div class="text-center">
+                        <div class="icon">👔</div>
+                        <h4>CEOs</h4>
+                        <div class="stat-number" style="font-size: 2rem; color: var(--navy);">40%</div>
+                        <p style="color: var(--dark-gray); margin-top: 0.5rem;">of content focus</p>
+                    </div>
+                </div>
+                <div class="card" style="border-top: 5px solid var(--gold);">
+                    <div class="text-center">
+                        <div class="icon">🔍</div>
+                        <h4>Headhunters</h4>
+                        <div class="stat-number" style="font-size: 2rem; color: var(--gold);">35%</div>
+                        <p style="color: var(--dark-gray); margin-top: 0.5rem;">of content focus</p>
+                    </div>
+                </div>
+                <div class="card" style="border-top: 5px solid var(--green);">
+                    <div class="text-center">
+                        <div class="icon">💼</div>
+                        <h4>Peer CFOs</h4>
+                        <div class="stat-number" style="font-size: 2rem; color: var(--green);">25%</div>
+                        <p style="color: var(--dark-gray); margin-top: 0.5rem;">of content focus</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CEO-FOCUSED CONTENT ===== -->
+    <div class="page page-break">
+        <div style="background: var(--navy); color: var(--white); padding: 1.5rem; margin: -3rem -2rem 2rem -2rem; text-align: center;">
+            <h3 style="color: var(--white); margin: 0;">1️⃣ CEO-FOCUSED CONTENT (40%)</h3>
+            <p style="color: var(--gold); margin: 0.5rem 0 0 0;">Position as Strategic CFO Who Solves Cash Flow Problems</p>
+        </div>
+
+        <div class="card info-card" style="margin-top: 2rem;">
+            <h4 style="color: var(--navy);">🎯 GOAL</h4>
+            <p>Position as the strategic CFO who solves CEO's biggest pain point: trapped working capital</p>
+        </div>
+
+        <div class="content-example" style="margin-top: 2rem; font-size: 1.05rem; line-height: 1.8;">
+            <strong style="display: block; margin-bottom: 1rem; color: var(--navy); font-size: 1.1rem;">📝 EXAMPLE POST:</strong>
+            
+            "Most Saudi CEOs are sitting on 2-5M SAR in trapped cash and don't know it.
+            <br><br>
+            Here are 5 working capital levers I use to free up cash in 90 days:
+            <br><br>
+            1. Renegotiate payment terms with top 10 suppliers (+18 days DPO)<br>
+            2. Automate AR collections (reduce DSO by 12-25 days)<br>
+            3. Inventory optimization (cut 15-30% excess stock)<br>
+            4. Intercompany netting for group structures<br>
+            5. Sale-leaseback for underutilized assets
+            <br><br>
+            What's worked for your business?"
+        </div>
+
+        <div class="lead-magnet-badge" style="margin-top: 1.5rem; display: block; text-align: center;">
+            🎁 LEAD MAGNET OFFER: Comment "CASH FLOW" → Receive 90-Day Diagnostic
+        </div>
+
+        <div class="results-box" style="margin-top: 2rem;">
+            <h5>📊 RESULTS</h5>
+            <ul>
+                <li><strong>47 CEO/CFO comments</strong> on post (high-quality engagement)</li>
+                <li><strong>12 DMs requesting framework</strong> within 48 hours</li>
+                <li><strong>3 consultation calls booked</strong> with CEOs from Vision 2030 companies</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ===== HEADHUNTER-FOCUSED CONTENT ===== -->
+    <div class="page page-break">
+        <div style="background: var(--gold); color: var(--navy); padding: 1.5rem; margin: -3rem -2rem 2rem -2rem; text-align: center;">
+            <h3 style="color: var(--navy); margin: 0;">2️⃣ HEADHUNTER-FOCUSED CONTENT (35%)</h3>
+            <p style="color: var(--navy); margin: 0.5rem 0 0 0; opacity: 0.8;">Become the "Obvious Candidate" Search Firms Recommend</p>
+        </div>
+
+        <div class="card info-card" style="margin-top: 2rem;">
+            <h4 style="color: var(--navy);">🎯 GOAL</h4>
+            <p>Position as the executive who understands what makes CFOs succeed in Vision 2030 projects—making you the obvious choice for search firms</p>
+        </div>
+
+        <div class="content-example" style="margin-top: 2rem; font-size: 1.05rem; line-height: 1.8;">
+            <strong style="display: block; margin-bottom: 1rem; color: var(--navy); font-size: 1.1rem;">📝 EXAMPLE POST:</strong>
+            
+            "Hiring a CFO for a Saudi giga project? Here's what gets overlooked:
+            <br><br>
+            Most search firms focus on technical skills. But the CFOs who fail in Vision 2030 projects lack:
+            <br><br>
+            • Stakeholder navigation (government, PIF, joint ventures)<br>
+            • Agile finance operations (monthly close in 3 days, not 15)<br>
+            • Digital-first mindset (EPM, BI, automation)
+            <br><br>
+            I've built a framework that scores candidates on 12 success criteria beyond the CV.
+            <br><br>
+            If you're filling CFO/VP Finance roles in KSA, let's connect."
+        </div>
+
+        <div class="lead-magnet-badge" style="margin-top: 1.5rem; display: block; text-align: center;">
+            🎁 LEAD MAGNET OFFER (via DM): "CFO Assessment Scorecard for Giga Projects"
+        </div>
+
+        <div class="results-box" style="margin-top: 2rem;">
+            <h5>📊 RESULTS</h5>
+            <ul>
+                <li><strong>8 headhunters connected</strong> within 2 weeks</li>
+                <li><strong>5 requested the scorecard</strong> to use in actual searches</li>
+                <li><strong>2 invited client to discuss roles</strong> (positioning as candidate without applying)</li>
+            </ul>
+        </div>
+
+        <div class="insight-box" style="margin-top: 2rem;">
+            <h5>💡 THE MAGIC</h5>
+            <p>By sharing search insights, the client positioned himself as a peer consultant to headhunters—not a desperate job seeker. When real roles opened up, he was top of mind.</p>
+        </div>
+    </div>
+
+    <!-- ===== PEER CFO CONTENT ===== -->
+    <div class="page page-break">
+        <div style="background: var(--green); color: var(--white); padding: 1.5rem; margin: -3rem -2rem 2rem -2rem; text-align: center;">
+            <h3 style="color: var(--white); margin: 0;">3️⃣ PEER CFO CONTENT (25%)</h3>
+            <p style="color: var(--white); margin: 0.5rem 0 0 0; opacity: 0.9;">Build Network & Referral Pipeline</p>
+        </div>
+
+        <div class="card info-card" style="margin-top: 2rem;">
+            <h4 style="color: var(--navy);">🎯 GOAL</h4>
+            <p>Build relationships with CFOs who can refer, introduce to boards, or recommend for opportunities</p>
+        </div>
+
+        <div class="content-example" style="margin-top: 2rem; font-size: 1.05rem; line-height: 1.8;">
+            <strong style="display: block; margin-bottom: 1rem; color: var(--navy); font-size: 1.1rem;">📝 EXAMPLE POST:</strong>
+            
+            "What's a fair CFO salary for a SAR 2-5B revenue company in Saudi Arabia in 2024?
+            <br><br>
+            Based on 30+ conversations with GCC CFOs:
+            <br><br>
+            <strong>Base:</strong> 80K-120K SAR/month<br>
+            <strong>Bonus:</strong> 25-40% of base (tied to EBITDA, cash flow targets)<br>
+            <strong>Housing:</strong> 150K-250K SAR/year<br>
+            <strong>Schooling:</strong> 80K-120K SAR/year (2-3 kids)<br>
+            <strong>Flights:</strong> 30K SAR/year
+            <br><br>
+            But most CFOs miss these 3 negotiation leverage points: [insider tips]
+            <br><br>
+            What's your experience?"
+        </div>
+
+        <div class="lead-magnet-badge" style="margin-top: 1.5rem; display: block; text-align: center;">
+            🎁 LEAD MAGNET OFFER: "CFO Salary Negotiation Playbook for KSA (14 leverage points)"
+        </div>
+
+        <div class="results-box" style="margin-top: 2rem;">
+            <h5>📊 RESULTS</h5>
+            <ul>
+                <li><strong>89 comments from finance leaders</strong> (highest engagement post)</li>
+                <li><strong>140+ profile views from CFOs</strong> in leading Saudi groups</li>
+                <li><strong>6 DMs from CFOs asking</strong> "Are you open to opportunities?"</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ===== LEAD MAGNETS ===== -->
+    <div class="page page-break">
+        <div class="section-header">
+            <h2>🎁 PHASE 3: LEAD MAGNET SYSTEM</h2>
+            <p>Converting Engagement into Conversations</p>
+        </div>
+
+        <div style="margin-top: 3rem;">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>STAKEHOLDER</th>
+                            <th>LEAD MAGNET</th>
+                            <th>CONVERSION GOAL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center;">
+                                    <span style="font-size: 1.5rem; margin-right: 0.75rem;">👔</span>
+                                    <strong>CEOs</strong>
+                                </div>
+                            </td>
+                            <td>90-Day Cash Flow Diagnostic Framework</td>
+                            <td><span class="badge badge-success">Book strategy call</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center;">
+                                    <span style="font-size: 1.5rem; margin-right: 0.75rem;">🔍</span>
+                                    <strong>Headhunters</strong>
+                                </div>
+                            </td>
+                            <td>CFO Assessment Scorecard for Giga Projects<br><small style="color: var(--dark-gray);">(Benchmarks, KPIs, Red Flags)</small></td>
+                            <td><span class="badge badge-warning">Position as top candidate</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center;">
+                                    <span style="font-size: 1.5rem; margin-right: 0.75rem;">💼</span>
+                                    <strong>CFOs</strong>
+                                </div>
+                            </td>
+                            <td>Salary Negotiation Playbook for KSA<br><small style="color: var(--dark-gray);">(14 Leverage Points)</small></td>
+                            <td><span class="badge badge-info">Build peer network & referrals</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center;">
+                                    <span style="font-size: 1.5rem; margin-right: 0.75rem;">📊</span>
+                                    <strong>Finance Directors</strong>
+                                </div>
+                            </td>
+                            <td>Breaking Into CFO: The Positioning Blueprint</td>
+                            <td><span class="badge badge-info">Attract aspirational audience</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div style="margin-top: 3rem;">
+            <h4 class="text-center mb-2">Lead Magnet Delivery Process</h4>
+            
+            <div class="flowchart">
+                <div class="flow-item" style="background: var(--light-blue);">
+                    <strong>ENGAGEMENT</strong><br>
+                    <span style="font-size: 0.9rem; color: var(--dark-gray);">Comment on Post</span>
+                </div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-item" style="background: var(--light-blue);">
+                    <strong>DM DELIVERY</strong><br>
+                    <span style="font-size: 0.9rem; color: var(--dark-gray);">Personalized Message + Framework</span>
+                </div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-item" style="background: var(--light-blue);">
+                    <strong>NURTURE</strong><br>
+                    <span style="font-size: 0.9rem; color: var(--dark-gray);">Follow-up Conversation Starters</span>
+                </div>
+                <div class="flow-arrow">↓</div>
+                <div class="flow-item" style="background: linear-gradient(135deg, var(--green), #48bb78); color: var(--white);">
+                    <strong>CONVERSION</strong><br>
+                    <span style="font-size: 0.9rem; opacity: 0.9;">Schedule Call / Meeting</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TIMELINE ===== -->
+    <div class="page page-break">
+        <div class="section-header">
+            <h2>📅 THE 90-DAY JOURNEY</h2>
+            <p>From Launch to Offer: Key Milestones</p>
+        </div>
+
+        <div class="timeline" style="margin-top: 3rem;">
+            <div class="timeline-item">
+                <div class="timeline-marker">🎯</div>
+                <div class="timeline-content">
+                    <div class="timeline-week">Week 1-2</div>
+                    <div class="timeline-title">Profile Optimized & Content Strategy Launched</div>
+                    <div class="timeline-description">Complete LinkedIn overhaul, CV redraft, and first strategic posts published</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-marker">💬</div>
+                <div class="timeline-content">
+                    <div class="timeline-week">Week 3</div>
+                    <div class="timeline-title">First CEO DM Requesting Cash Flow Framework</div>
+                    <div class="timeline-description">CEO from $650M manufacturing group engaged with working capital post</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-marker" style="background: var(--gold);">📞</div>
+                <div class="timeline-content">
+                    <div class="timeline-week">Week 5</div>
+                    <div class="timeline-title">Headhunter Invites to Discuss VP Finance Role</div>
+                    <div class="timeline-description">Executive search firm reached out after seeing giga project CFO content</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-marker">💼</div>
+                <div class="timeline-content">
+                    <div class="timeline-week">Week 6</div>
+                    <div class="timeline-title">CEO from Family Conglomerate Requests Consultation</div>
+                    <div class="timeline-description">Discussion about digital transformation and ERP implementation advisory</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-marker" style="background: var(--gold);">🤝</div>
+                <div class="timeline-content">
+                    <div class="timeline-week">Week 8</div>
+                    <div class="timeline-title">Board Member Introduction via Mutual CFO Connection</div>
+                    <div class="timeline-description">Peer CFO (from salary negotiation post) introduced to board member of real estate developer</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-marker" style="background: var(--green);">🎤</div>
+                <div class="timeline-content">
+                    <div class="timeline-week">Week 10</div>
+                    <div class="timeline-title">First Formal CFO Interview</div>
+                    <div class="timeline-description">CFO role at $850M manufacturing group (Vision 2030 aligned)</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-marker" style="background: var(--green);">📋</div>
+                <div class="timeline-content">
+                    <div class="timeline-week">Week 12</div>
+                    <div class="timeline-title">Shortlisted for Second Company</div>
+                    <div class="timeline-description">Group CFO role at real estate developer (board introduction converted)</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-marker" style="background: var(--green); font-size: 2rem;">🎉</div>
+                <div class="timeline-content" style="background: linear-gradient(135deg, var(--green), #48bb78); color: var(--white);">
+                    <div class="timeline-week" style="color: var(--white);">Week 14</div>
+                    <div class="timeline-title" style="color: var(--white);">OFFER RECEIVED</div>
+                    <div class="timeline-description" style="color: var(--white); opacity: 0.95;">CFO, Logistics & Supply Chain company, Vision 2030 project</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FINAL OUTCOME ===== -->
+    <div class="page page-break">
+        <div class="outcome-box">
+            <h3>✅ FINAL OUTCOME</h3>
+            <div class="outcome-grid">
+                <div class="outcome-item">
+                    <div class="outcome-icon">🎯</div>
+                    <div class="outcome-text">2 CFO Offers<br>within 90 days</div>
+                </div>
+                <div class="outcome-item">
+                    <div class="outcome-icon">💰</div>
+                    <div class="outcome-text">28% Salary Increase<br>(vs. original target)</div>
+                </div>
+                <div class="outcome-item">
+                    <div class="outcome-icon">🎭</div>
+                    <div class="outcome-text">Positioned as Peer<br>(not applicant)</div>
+                </div>
+                <div class="outcome-item">
+                    <div class="outcome-icon">📬</div>
+                    <div class="outcome-text">100% Inbound<br>(zero applications)</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="testimonial" style="margin-top: 3rem;">
+            <p class="testimonial-text">
+                "I went from chasing headhunters to choosing between offers. The content ecosystem changed everything—I became visible to the right people at the right time."
+            </p>
+            <div class="testimonial-author">Finance Director → CFO</div>
+            <div class="testimonial-role">Vision 2030 Logistics Company (Confidential)</div>
+        </div>
+    </div>
+
+    <!-- ===== THE FRAMEWORK ===== -->
+    <div class="page page-break">
+        <div class="section-header">
+            <h2>HOW THE FRAMEWORK WORKS</h2>
+            <p>The Complete Inbound Ecosystem</p>
+        </div>
+
+        <div class="flowchart" style="margin-top: 3rem;">
+            <div class="flow-item" style="background: var(--navy); color: var(--white);">
+                <strong style="font-size: 1.25rem;">STRATEGIC POSITIONING</strong><br>
+                Optimized Profile = Digital Storefront
+            </div>
+            <div class="flow-arrow">↓</div>
+            
+            <div class="flow-item" style="background: var(--gold); color: var(--navy);">
+                <strong style="font-size: 1.25rem;">HIGH-VALUE CONTENT</strong><br>
+                Thought Leadership & Authority Building
+            </div>
+            <div class="flow-arrow">↓</div>
+
+            <div class="flow-split">
+                <div class="flow-item" style="background: var(--light-blue);">
+                    <strong>CEO-Focused</strong><br>
+                    Content (40%)
+                </div>
+                <div class="flow-item" style="background: var(--light-blue);">
+                    <strong>Headhunter</strong><br>
+                    Insights (35%)
+                </div>
+                <div class="flow-item" style="background: var(--light-blue);">
+                    <strong>Peer CFO</strong><br>
+                    Engagement (25%)
+                </div>
+            </div>
+            <div class="flow-arrow">↓</div>
+
+            <div class="flow-item" style="background: var(--gold); color: var(--navy);">
+                <strong style="font-size: 1.25rem;">ENGAGEMENT & LEAD MAGNETS</strong><br>
+                High-Value Frameworks Delivered via DM
+            </div>
+            <div class="flow-arrow">↓</div>
+
+            <div class="flow-split">
+                <div class="flow-item" style="background: var(--light-blue);">
+                    90-Day Cash<br>
+                    Flow Tool
+                </div>
+                <div class="flow-item" style="background: var(--light-blue);">
+                    CFO<br>
+                    Scorecard
+                </div>
+                <div class="flow-item" style="background: var(--light-blue);">
+                    Salary<br>
+                    Playbook
+                </div>
+            </div>
+            <div class="flow-arrow">↓</div>
+
+            <div class="flow-item" style="background: var(--navy); color: var(--white);">
+                <strong style="font-size: 1.25rem;">INBOUND CONVERSATIONS</strong><br>
+                DMs • Connection Requests • Consultation Calls
+            </div>
+            <div class="flow-arrow">↓</div>
+
+            <div class="flow-item" style="background: linear-gradient(135deg, var(--green), #48bb78); color: var(--white);">
+                <strong style="font-size: 1.5rem;">OPPORTUNITY PIPELINE</strong><br>
+                Interviews → Shortlists → Offers
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== COMPARISON: INBOUND VS OUTBOUND ===== -->
+    <div class="page page-break">
+        <div class="section-header">
+            <h2>WHY INBOUND WINS</h2>
+            <p>The Strategic Advantage of Content Ecosystems</p>
+        </div>
+
+        <div class="comparison-table" style="margin-top: 3rem;">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 50%; background: var(--red);">❌ OUTBOUND APPROACH</th>
+                        <th style="width: 50%; background: var(--green);">✅ INBOUND ECOSYSTEM</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="negative"><strong>You're a stranger</strong> to decision-makers</td>
+                        <td class="positive"><strong>You're a known authority</strong> before first contact</td>
+                    </tr>
+                    <tr>
+                        <td class="negative"><strong>Costs time & energy daily</strong> with manual outreach</td>
+                        <td class="positive"><strong>Content works 24/7</strong> generating opportunities</td>
+                    </tr>
+                    <tr>
+                        <td class="negative"><strong>3-5% response rate</strong> on cold emails</td>
+                        <td class="positive"><strong>40-60% engagement rate</strong> on targeted content</td>
+                    </tr>
+                    <tr>
+                        <td class="negative"><strong>Positioned as job seeker</strong> (lower negotiating power)</td>
+                        <td class="positive"><strong>Positioned as solution provider</strong> (peer status)</td>
+                    </tr>
+                    <tr>
+                        <td class="negative"><strong>Transactional interactions</strong> focused on immediate need</td>
+                        <td class="positive"><strong>Relational conversations</strong> building long-term value</td>
+                    </tr>
+                    <tr>
+                        <td class="negative"><strong>Race to the bottom</strong> competing with hundreds</td>
+                        <td class="positive"><strong>Choice of opportunities</strong> from multiple sources</td>
+                    </tr>
+                    <tr>
+                        <td class="negative"><strong>Expensive & exhausting</strong> with diminishing returns</td>
+                        <td class="positive"><strong>Cost-effective & scalable</strong> with compounding returns</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="insight-box" style="margin-top: 3rem;">
+            <h5>💡 THE BOTTOM LINE</h5>
+            <p>Inbound methodologies flip the dynamic from "I need a job" to "I have opportunities to evaluate." This fundamental shift in positioning changes salary negotiations, role scope discussions, and career trajectory.</p>
+        </div>
+    </div>
+
+    <!-- ===== WHO THIS SERVES ===== -->
+    <div class="page page-break">
+        <div class="section-header">
+            <h2>WHO THIS FRAMEWORK SERVES</h2>
+            <p>Three Types of Finance Leaders We Help</p>
+        </div>
+
+        <div style="margin-top: 3rem;">
+            <div class="card" style="margin-bottom: 2rem; border-left: 5px solid var(--navy);">
+                <h4 style="color: var(--navy);">✅ WESTERN FINANCE LEADERS TARGETING KSA/UAE</h4>
+                <p style="line-height: 1.8; margin-top: 1rem;">
+                    You bring Big 4, multinational, or London/US corporate experience. You understand Western governance but need to position yourself for Vision 2030, PIF portfolio companies, or GCC family conglomerates.
+                </p>
+                <div style="background: var(--light-blue); padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem;">
+                    <div><strong style="color: var(--red);">Challenge:</strong> Seen as "expensive" or "culturally unfamiliar"</div>
+                    <div style="margin-top: 0.5rem;"><strong style="color: var(--green);">Solution:</strong> Position as the bridge—the CFO who brings international rigor AND understands GCC ambition</div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: 2rem; border-left: 5px solid var(--gold);">
+                <h4 style="color: var(--gold);">✅ GCC SENIOR FINANCE LEADERS READY FOR CFO</h4>
+                <p style="line-height: 1.8; margin-top: 1rem;">
+                    You're a Finance Director, Group Controller, or VP Finance with 10-18 years' experience. You're ready for CFO/CRO but invisible to executive search firms.
+                </p>
+                <div style="background: var(--light-blue); padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem;">
+                    <div><strong style="color: var(--red);">Challenge:</strong> Breaking the perception ceiling—stuck as "senior manager" not "C-suite ready"</div>
+                    <div style="margin-top: 0.5rem;"><strong style="color: var(--green);">Solution:</strong> Establish thought leadership BEFORE search begins, so headhunters position you as their top candidate</div>
+                </div>
+            </div>
+
+            <div class="card" style="border-left: 5px solid var(--green);">
+                <h4 style="color: var(--green);">✅ EMPLOYED CFOs SEEKING BETTER OPPORTUNITIES</h4>
+                <p style="line-height: 1.8; margin-top: 1rem;">
+                    You're currently employed but open to the right role—without publicly "looking for work." You need discrete visibility to decision-makers.
+                </p>
+                <div style="background: var(--light-blue); padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem;">
+                    <div><strong style="color: var(--red);">Challenge:</strong> Can't openly job search without jeopardizing current role</div>
+                    <div style="margin-top: 0.5rem;"><strong style="color: var(--green);">Solution:</strong> Inbound visibility lets you explore opportunities discreetly while building authority</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== WHAT YOU GET ===== -->
+    <div class="page page-break">
+        <div class="section-header">
+            <h2>WHAT YOU GET WHEN WE WORK TOGETHER</h2>
+            <p>Complete 90-Day Transformation Package</p>
+        </div>
+
+        <div style="margin-top: 3rem;">
+            <div class="card" style="background: linear-gradient(135deg, var(--light-blue), #d4e9f7); border-left: 5px solid var(--navy); margin-bottom: 2rem;">
+                <h4 style="color: var(--navy);">⏱ WEEK 1-2: FOUNDATION</h4>
+                <ul class="checklist" style="margin-top: 1rem;">
+                    <li>LinkedIn profile complete overhaul (headline, summary, experience)</li>
+                    <li>CV redraft with C-suite positioning and quantified impact</li>
+                    <li>Executive bio & positioning statement for multiple channels</li>
+                    <li>Proprietary framework development (your "signature method")</li>
+                    <li>Content strategy roadmap (12-week calendar)</li>
+                </ul>
+            </div>
+
+            <div class="card" style="background: linear-gradient(135deg, #fff9e6, #fff3cc); border-left: 5px solid var(--gold); margin-bottom: 2rem;">
+                <h4 style="color: var(--gold);">⏱ WEEK 3-8: CONTENT ECOSYSTEM LAUNCH</h4>
+                <ul class="checklist" style="margin-top: 1rem;">
+                    <li>12-week content calendar targeting 3 audiences (CEOs, headhunters, CFOs)</li>
+                    <li>Ghost-written posts (2-3 per week) with engagement optimization</li>
+                    <li>Lead magnet creation (4 custom frameworks aligned with your expertise)</li>
+                    <li>Engagement scripts & strategic question frameworks</li>
+                    <li>Weekly performance analysis & content iteration</li>
+                </ul>
+            </div>
+
+            <div class="card" style="background: linear-gradient(135deg, #f0fff4, #dcf5e6); border-left: 5px solid var(--green);">
+                <h4 style="color: var(--green);">⏱ WEEK 9-12: INBOUND LEAD NURTURE</h4>
+                <ul class="checklist" style="margin-top: 1rem;">
+                    <li>DM response frameworks for different stakeholder types</li>
+                    <li>Headhunter conversation scripts & positioning guidance</li>
+                    <li>CEO meeting preparation & value demonstration frameworks</li>
+                    <li>Interview positioning & negotiation coaching</li>
+                    <li>Offer evaluation & compensation benchmarking</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CTA PAGE ===== -->
+    <div class="page page-break">
+        <div style="text-align: center; padding: 3rem 0;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 2rem;">THE BOTTOM LINE</h2>
+            
+            <div style="max-width: 700px; margin: 0 auto 3rem auto; font-size: 1.25rem; line-height: 1.8; color: var(--dark-gray);">
+                <p><strong>You don't need more applications.</strong></p>
+                <p><strong>You need an inbound ecosystem that makes decision-makers seek you out.</strong></p>
+            </div>
+
+            <div class="divider" style="max-width: 200px; margin: 3rem auto;"></div>
+
+            <h3 style="margin-bottom: 2rem;">This Framework Has Helped Finance Leaders:</h3>
+
+            <div class="grid-3" style="margin: 2rem auto 3rem auto; max-width: 900px;">
+                <div class="card" style="text-align: center; background: var(--light-blue);">
+                    <div class="icon">🎯</div>
+                    <h5 style="color: var(--navy);">Get Headhunted</h5>
+                    <p style="color: var(--dark-gray);">(Not Apply)</p>
+                </div>
+                <div class="card" style="text-align: center; background: var(--light-blue);">
+                    <div class="icon">🤝</div>
+                    <h5 style="color: var(--navy);">Interview as Peers</h5>
+                    <p style="color: var(--dark-gray);">(Not Applicants)</p>
+                </div>
+                <div class="card" style="text-align: center; background: var(--light-blue);">
+                    <div class="icon">✅</div>
+                    <h5 style="color: var(--navy);">Choose Offers</h5>
+                    <p style="color: var(--dark-gray);">(Not Chase Rejections)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="cta-section">
+            <h2 class="cta-title">🎯 READY TO GET STARTED?</h2>
+            <p class="cta-text">
+                I offer a complimentary 30-minute positioning audit where we:
+            </p>
+            <div style="max-width: 600px; margin: 2rem auto;">
+                <ul class="checklist" style="text-align: left;">
+                    <li>Review your current visibility & messaging</li>
+                    <li>Identify your biggest inbound opportunities</li>
+                    <li>Map your custom 90-day campaign</li>
+                </ul>
+            </div>
+            <a href="https://www.linkedin.com/in/shamsfaroooq/" class="cta-button" target="_blank">📩 DM ME ON LINKEDIN</a>
+        </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <div class="page" style="min-height: auto;">
+        <div class="footer">
+            <div class="footer-divider"></div>
+            
+            <h5 style="color: var(--navy); margin-bottom: 1rem;">CONFIDENTIALITY NOTE</h5>
+            <p style="max-width: 700px; margin: 0 auto 2rem auto;">
+                Client details have been anonymized per privacy agreements. Methodology, metrics, and results are accurate representations of actual client engagements.
+            </p>
+
+            <div class="footer-divider"></div>
+
+            <div class="author-name">Shams Farooq</div>
+            
+            <h5 style="color: var(--navy); margin-bottom: 1rem;">ABOUT THE AUTHOR</h5>
+            <p style="max-width: 800px; margin: 0 auto 2rem auto;">
+                I specialize in positioning CFOs and senior finance leaders for unpublished C-suite roles in Saudi Arabia and UAE. My inbound content ecosystem has generated opportunities for ICAEW, Big 4, and multinational finance executives targeting Vision 2030 companies, family offices, and giga projects.
+            </p>
+
+            <a href="https://www.linkedin.com/in/shamsfaroooq/" class="linkedin-cta" target="_blank">
+                💼 Connect & DM on LinkedIn
+            </a>
+
+            <div class="footer-divider"></div>
+
+            <p style="margin-top: 2rem; color: var(--dark-gray); font-size: 0.85rem;">
+                © 2025 Shams Farooq | Executive Positioning Framework | Results-Based C-Suite Placement
+            </p>
+        </div>
+    </div>
+
+</body>
+</html>
